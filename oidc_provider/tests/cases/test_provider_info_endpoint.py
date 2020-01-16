@@ -35,7 +35,7 @@ class ProviderInfoTestCase(TestCase):
 
     def test_expected_keys_in_response(self):
         """
-        Test that response contains all ncecessary keys
+        Test that response contains all necessary keys
         """
         required_keys = {
             'issuer',
@@ -56,7 +56,7 @@ class ProviderInfoTestCase(TestCase):
 
         response = ProviderInfoView.as_view()(request)
         resp_keys = set(json.loads(response.content.decode('utf-8')).keys())
-        self.assertEqual(required_keys, resp_keys)
+        self.assertEqual(resp_keys, required_keys)
 
     def test_claims_supported_not_set(self):
         """
