@@ -1,6 +1,7 @@
 import logging
 
 from django.http import JsonResponse
+from django.contrib.auth.hashers import check_password
 
 from oidc_provider.lib.errors import TokenIntrospectionError
 from oidc_provider.lib.utils.common import run_processing_hook
@@ -47,9 +48,11 @@ class TokenIntrospectionEndpoint(object):
             raise TokenIntrospectionError()
 
         try:
-            self.client = Client.objects.get(
-                client_id=self.params['client_id'],
-                client_secret=self.params['client_secret'])
+            client = Client.objects.get(client_id=self.params['client_id'])
+            if not check_password(self.params['client_secret']. client.client_secret):
+                raise Client.DoesNotExist()
+            self.client = client
+
         except Client.DoesNotExist:
             logger.debug('[Introspection] No valid client for id: %s',
                          self.params['client_id'])

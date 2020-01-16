@@ -4,6 +4,7 @@ import logging
 from base64 import urlsafe_b64encode
 
 from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import check_password
 from django.http import JsonResponse
 
 from oidc_provider import settings
@@ -59,7 +60,7 @@ class TokenEndpoint(object):
             raise TokenError('invalid_client')
 
         if self.client.client_type == 'confidential':
-            if not (self.client.client_secret == self.params['client_secret']):
+            if not check_password(self.params['client_secret'], self.client.client_secret):
                 logger.debug('[Token] Invalid client secret: client %s do not have secret %s',
                              self.client.client_id, self.client.client_secret)
                 raise TokenError('invalid_client')
