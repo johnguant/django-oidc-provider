@@ -72,8 +72,8 @@ class ProviderInfoTestCase(TestCase):
     @override_settings(OIDC_CLAIMS_SUPPORTED=['openid', 'email'])
     def test_claims_supported_set(self):
         """
-        If OIDC_CLAIMS_SUPPORTED is not set in settings.py, the claims_supported
-        entry is an empty list
+        If OIDC_CLAIMS_SUPPORTED is set in settings.py, the claims_supported
+        entry contains those claims
         """
         expected_claims = ['openid', 'email']
 
