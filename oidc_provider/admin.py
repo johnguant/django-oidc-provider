@@ -6,7 +6,8 @@ from django.forms import ModelForm
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
-from oidc_provider.models import Client, Code, Token, RSAKey
+from oidc_provider import settings
+from oidc_provider.models import Client, Code, Token, RSAKeyDatabase, RSAKeyFilesystem
 
 
 class ClientForm(ModelForm):
@@ -90,7 +91,24 @@ class TokenAdmin(admin.ModelAdmin):
         return False
 
 
-@admin.register(RSAKey)
 class RSAKeyAdmin(admin.ModelAdmin):
 
     readonly_fields = ['kid']
+
+
+@admin.register(RSAKeyFilesystem)
+class RSAKeyFilesystemAdmin(RSAKeyAdmin):
+    def get_model_perms(self, request):
+        if settings.get('OIDC_RSA_CERT_STORE') == 'filesystem':
+            return super().get_model_perms(request)
+
+        return {}
+
+
+@admin.register(RSAKeyDatabase)
+class RSAKeyDatabaseAdmin(RSAKeyAdmin):
+    def get_model_perms(self, request):
+        if settings.get('OIDC_RSA_CERT_STORE') == 'database':
+            return super().get_model_perms(request)
+
+        return {}

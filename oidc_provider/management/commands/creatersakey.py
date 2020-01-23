@@ -9,7 +9,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             key = RSA.generate(2048)
-            rsakey = RSAKey(key=key.exportKey('PEM').decode('utf8'))
+            rsakey = RSAKey.model()(key=key.exportKey('PEM').decode('utf8'))
             rsakey.save()
             self.stdout.write(u'RSA key successfully created with kid: {0}'.format(rsakey.kid))
         except Exception as e:

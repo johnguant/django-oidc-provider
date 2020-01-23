@@ -7,7 +7,11 @@ import json
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
+from django.conf import settings as django_settings
+from django.core.exceptions import ValidationError
+from Cryptodome.PublicKey import RSA
+
+from oidc_provider import settings
 
 
 CLIENT_TYPE_CHOICES = [
@@ -58,7 +62,7 @@ class Client(models.Model):
 
     name = models.CharField(max_length=100, default='', verbose_name=_(u'Name'))
     owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name=_(u'Owner'), blank=True,
+        django_settings.AUTH_USER_MODEL, verbose_name=_(u'Owner'), blank=True,
         null=True, default=None, on_delete=models.SET_NULL, related_name='oidc_clients_set')
     client_type = models.CharField(
         max_length=30,
@@ -185,7 +189,7 @@ class BaseCodeTokenModel(models.Model):
 class Code(BaseCodeTokenModel):
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name=_(u'User'), on_delete=models.CASCADE)
+        django_settings.AUTH_USER_MODEL, verbose_name=_(u'User'), on_delete=models.CASCADE)
     code = models.CharField(max_length=255, unique=True, verbose_name=_(u'Code'))
     nonce = models.CharField(max_length=255, blank=True, default='', verbose_name=_(u'Nonce'))
     is_authentication = models.BooleanField(default=False, verbose_name=_(u'Is Authentication?'))
@@ -204,7 +208,7 @@ class Code(BaseCodeTokenModel):
 class Token(BaseCodeTokenModel):
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, verbose_name=_(u'User'), on_delete=models.CASCADE)
+        django_settings.AUTH_USER_MODEL, null=True, verbose_name=_(u'User'), on_delete=models.CASCADE)
     access_token = models.CharField(max_length=255, unique=True, verbose_name=_(u'Access Token'))
     refresh_token = models.CharField(max_length=255, unique=True, verbose_name=_(u'Refresh Token'))
     _id_token = models.TextField(verbose_name=_(u'ID Token'))
@@ -240,7 +244,7 @@ class Token(BaseCodeTokenModel):
 class UserConsent(BaseCodeTokenModel):
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name=_(u'User'), on_delete=models.CASCADE)
+        django_settings.AUTH_USER_MODEL, verbose_name=_(u'User'), on_delete=models.CASCADE)
     date_given = models.DateTimeField(verbose_name=_(u'Date Given'))
 
     class Meta:
@@ -248,13 +252,18 @@ class UserConsent(BaseCodeTokenModel):
 
 
 class RSAKey(models.Model):
-
-    key = models.TextField(
-        verbose_name=_(u'Key'), help_text=_(u'Paste your private RSA Key here.'))
-
     class Meta:
+        abstract = True
         verbose_name = _(u'RSA Key')
         verbose_name_plural = _(u'RSA Keys')
+
+    @staticmethod
+    def model():
+        if settings.get("OIDC_RSA_CERT_STORE") == "database":
+            return RSAKeyDatabase
+        elif settings.get("OIDC_RSA_CERT_STORE") == "filesystem":
+            return RSAKeyFilesystem
+        raise Exception("unreachable")
 
     def __str__(self):
         return u'{0}'.format(self.kid)
@@ -262,6 +271,49 @@ class RSAKey(models.Model):
     def __unicode__(self):
         return self.__str__()
 
+
+    def clean(self):
+        try:
+            RSA.importKey(self.key)
+        except ValueError as e:
+            raise ValidationError("Could not validate RSA key. It must be in either PKCS#1 (binary or PEM), PKCS#8 (binary or PEM), or OpenSSH text format") from e
+
+
+class RSAKeyDatabase(RSAKey):
+
+    key = models.TextField(
+        verbose_name=_(u'Key'), help_text=_(u'Paste your private RSA Key here.'))
+
     @property
     def kid(self):
         return u'{0}'.format(md5(self.key.encode('utf-8')).hexdigest() if self.key else '')
+
+
+class RSAKeyFilesystem(RSAKey):
+
+    _key = models.FileField(
+        upload_to="oidc_provider/rsa_keys/", verbose_name=_('Key'), help_text=_('Upload your private key here.')
+    )
+
+    @property
+    def kid(self):
+        return u'{0}'.format(md5(self.key).hexdigest() if self.key else '')
+
+    @property
+    def key(self):
+        try:
+            # The file is opened implicitly, but if this method is called
+            # multiple times we need to do this to reset the file pointer.
+            self._key.open()
+            return self._key.read()
+        except ValueError:
+            return None
+
+    def __del__(self):
+        """
+        Why this isn't done by FileField I don't know
+        """
+        try:
+            self._key.close()
+        except AttributeError:
+            pass
