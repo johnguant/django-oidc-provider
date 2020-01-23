@@ -208,7 +208,11 @@ class Code(BaseCodeTokenModel):
 class Token(BaseCodeTokenModel):
 
     user = models.ForeignKey(
-        django_settings.AUTH_USER_MODEL, null=True, verbose_name=_(u'User'), on_delete=models.CASCADE)
+        django_settings.AUTH_USER_MODEL,
+        null=True,
+        verbose_name=_(u'User'),
+        on_delete=models.CASCADE
+    )
     access_token = models.CharField(max_length=255, unique=True, verbose_name=_(u'Access Token'))
     refresh_token = models.CharField(max_length=255, unique=True, verbose_name=_(u'Refresh Token'))
     _id_token = models.TextField(verbose_name=_(u'ID Token'))
@@ -271,12 +275,13 @@ class RSAKey(models.Model):
     def __unicode__(self):
         return self.__str__()
 
-
     def clean(self):
         try:
             RSA.importKey(self.key)
         except ValueError as e:
-            raise ValidationError("Could not validate RSA key. It must be in either PKCS#1 (binary or PEM), PKCS#8 (binary or PEM), or OpenSSH text format") from e
+            raise ValidationError(
+                "Could not validate RSA key. It must be in either PKCS#1 (binary or PEM), PKCS#8 "
+                "(binary or PEM), or OpenSSH text format") from e
 
 
 class RSAKeyDatabase(RSAKey):
@@ -292,7 +297,9 @@ class RSAKeyDatabase(RSAKey):
 class RSAKeyFilesystem(RSAKey):
 
     _key = models.FileField(
-        upload_to="oidc_provider/rsa_keys/", verbose_name=_('Key'), help_text=_('Upload your private key here.')
+        upload_to="oidc_provider/rsa_keys/",
+        verbose_name=_('Key'),
+        help_text=_('Upload your private key here.')
     )
 
     @property

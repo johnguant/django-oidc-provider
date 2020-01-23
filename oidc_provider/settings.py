@@ -185,7 +185,6 @@ class DefaultSettings(object):
         """
         return False
 
-
     @property
     def OIDC_RSA_CERT_STORE(self):
         """

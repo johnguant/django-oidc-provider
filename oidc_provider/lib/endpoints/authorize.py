@@ -51,7 +51,7 @@ class AuthorizeEndpoint(object):
         elif self.params['response_type'] in ['id_token', 'id_token token', 'token']:
             self.grant_type = 'implicit'
         elif self.params['response_type'] in [
-             'code token', 'code id_token', 'code id_token token']:
+                'code token', 'code id_token', 'code id_token token']:
             self.grant_type = 'hybrid'
         else:
             self.grant_type = None
@@ -107,7 +107,8 @@ class AuthorizeEndpoint(object):
                 self.params['redirect_uri'], 'unsupported_response_type', self.grant_type)
 
         if (not self.is_authentication and (self.grant_type == 'hybrid' or
-           self.params['response_type'] in ['id_token', 'id_token token'])):
+                                            self.params['response_type'] in
+                                            ['id_token', 'id_token token'])):
             logger.debug('[Authorize] Missing openid scope.')
             raise AuthorizeError(self.params['redirect_uri'], 'invalid_scope', self.grant_type)
 
@@ -154,7 +155,7 @@ class AuthorizeEndpoint(object):
 
                 # Check if response_type must include access_token in the response.
                 if (self.params['response_type'] in
-                   ['id_token token', 'token', 'code token', 'code id_token token']):
+                        ['id_token token', 'token', 'code token', 'code id_token token']):
                     query_fragment['access_token'] = token.access_token
 
                 # We don't need id_token if it's an OAuth2 request.
