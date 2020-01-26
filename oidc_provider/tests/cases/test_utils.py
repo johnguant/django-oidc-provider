@@ -26,6 +26,7 @@ class CommonTest(TestCase):
     """
     Test cases for common utils.
     """
+
     def test_get_issuer(self):
         request = Request()
 

@@ -657,7 +657,7 @@ class TokenTestCase(TestCase):
 
     @override_settings(
         OIDC_IDTOKEN_PROCESSING_HOOK=(
-                'oidc_provider.tests.app.utils.fake_idtoken_processing_hook',
+            'oidc_provider.tests.app.utils.fake_idtoken_processing_hook',
         )
     )
     def test_additional_idtoken_processing_hook_one_element_in_tuple(self):
@@ -724,8 +724,8 @@ class TokenTestCase(TestCase):
 
     @override_settings(
         OIDC_IDTOKEN_PROCESSING_HOOK=(
-                'oidc_provider.tests.app.utils.fake_idtoken_processing_hook',
-                'oidc_provider.tests.app.utils.fake_idtoken_processing_hook2',
+            'oidc_provider.tests.app.utils.fake_idtoken_processing_hook',
+            'oidc_provider.tests.app.utils.fake_idtoken_processing_hook2',
         )
     )
     def test_additional_idtoken_processing_hook_two_elements_in_tuple(self):
@@ -749,7 +749,7 @@ class TokenTestCase(TestCase):
 
     @override_settings(
         OIDC_IDTOKEN_PROCESSING_HOOK=(
-                'oidc_provider.tests.app.utils.fake_idtoken_processing_hook3'))
+            'oidc_provider.tests.app.utils.fake_idtoken_processing_hook3'))
     def test_additional_idtoken_processing_hook_scope_available(self):
         """
         Test scope is available in OIDC_IDTOKEN_PROCESSING_HOOK.
@@ -762,7 +762,7 @@ class TokenTestCase(TestCase):
 
     @override_settings(
         OIDC_IDTOKEN_PROCESSING_HOOK=(
-                'oidc_provider.tests.app.utils.fake_idtoken_processing_hook4'))
+            'oidc_provider.tests.app.utils.fake_idtoken_processing_hook4'))
     def test_additional_idtoken_processing_hook_kwargs(self):
         """
         Test correct kwargs are passed to OIDC_IDTOKEN_PROCESSING_HOOK.

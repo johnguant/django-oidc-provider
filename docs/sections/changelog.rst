@@ -9,8 +9,13 @@ Unreleased
 ==========
 
 * Added: scope on token and introspection endpoints.
+* Added: Support for storing RSA keys in the filesystem instead of the database.
+* Added: CLI command to migrate RSA keys to the filesystem `migratersakeys`.
+* Added: Support for the `claims_supported` field of openid-configuration.
 * Fixed: example project on Django 2.1.
 * Fixed: example in docs for translatable scopes (ugettext).
+* Fixed: Authorize page will redirect to login if the user logs out in the middle.
+* Removed: Support for Python 2.
 
 0.7.0
 =====

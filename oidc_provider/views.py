@@ -305,7 +305,7 @@ class JwksView(View):
     def get(self, request, *args, **kwargs):
         dic = dict(keys=[])
 
-        for rsakey in RSAKey.objects.all():
+        for rsakey in RSAKey.model().objects.all():
             public_key = RSA.importKey(rsakey.key).publickey()
             dic['keys'].append({
                 'kty': 'RSA',
