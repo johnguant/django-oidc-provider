@@ -258,9 +258,13 @@ Default is an empty list as this application will not make assumptions about wha
 OIDC_RSA_CERT_STORE
 ===================
 
-RECOMMENDED: A ``str``, one of `['database', 'filesystem']`
+RECOMMENDED: A ``str``, one of ``['database', 'filesystem']``
 
-If this is set to `'database'` RSA certs will be stored in the database.
-If this is set to `'filesystem'` they will be stored in ``MEDIA_ROOT`/oidc_provider/rsa_keys/`.
+If this is set to ``'database'`` RSA certs will be stored in the database.
+If this is set to ``'filesystem'`` they will be stored in ``MEDIA_ROOT/oidc_provider/rsa_keys/``.
 
-It is recommended to set this to `'filesystem'` for new applications if possible.
+It is recommended to set this to ``'filesystem'`` for new applications if possible.
+
+.. note::
+    When using ``'filesystem'`` with the default file storage, or another local file storage, you will
+    need to sync RSA keys between your application servers.
