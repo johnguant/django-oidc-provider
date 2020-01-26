@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import base64
 import binascii
+from operator import attrgetter
 from hashlib import md5, sha256
 import json
+from urllib.parse import urlparse
 
 from django.db import models
 from django.utils import timezone
@@ -104,7 +106,11 @@ class Client(models.Model):
         help_text=_('If disabled, the Server will NEVER ask the user for consent.'))
     _redirect_uris = models.TextField(
         default='', verbose_name=_(u'Redirect URIs'),
-        help_text=_(u'Enter each URI on a new line.'))
+        help_text=_(
+            u'Enter each URI on a new line. For native applications using looback addresses'
+            ' the port will be ignored to support applications binding to ephemeral ports.'
+        )
+    )
     _post_logout_redirect_uris = models.TextField(
         blank=True,
         default='',
@@ -160,6 +166,49 @@ class Client(models.Model):
     @property
     def default_redirect_uri(self):
         return self.redirect_uris[0] if self.redirect_uris else ''
+
+    def is_allowed_redirect_uri(self, redirect_uri_str):
+        """
+        Determine whether a given `redirect_uri` is allowed for this client.
+
+        This uses simple string matching UNLESS the host section is equal to
+        either '127.0.0.1' or '[::1]'. This is to support native apps which
+        bind to an ephemeral port.
+
+        See https://tools.ietf.org/html/rfc8252#section-7.3
+        """
+
+        if redirect_uri_str in self.redirect_uris:
+            return True
+
+        try:
+            redirect_uri = urlparse(
+                redirect_uri_str if "//" in redirect_uri_str else "//" + redirect_uri_str
+            )
+        except ValueError:
+            return False
+
+        if redirect_uri.hostname not in ["::1", "127.0.0.1"]:
+            return False
+
+        for allowed_redirect_uri_str in self.redirect_uris:
+            try:
+                allowed_redirect_uri = urlparse(
+                    allowed_redirect_uri_str if "//" in allowed_redirect_uri_str
+                    else "//" + allowed_redirect_uri_str
+                )
+            except ValueError:
+                return False
+
+            # Elements that should be checked, excludes port & netloc
+            getter = attrgetter(
+                "scheme", "path", "query", "params", "fragment", "username", "password", "hostname"
+            )
+
+            if getter(allowed_redirect_uri) == getter(redirect_uri):
+                return True
+
+        return False
 
 
 class BaseCodeTokenModel(models.Model):

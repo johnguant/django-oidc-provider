@@ -65,7 +65,7 @@ class TokenEndpoint(object):
                 raise TokenError('invalid_client')
 
         if self.params['grant_type'] == 'authorization_code':
-            if not (self.params['redirect_uri'] in self.client.redirect_uris):
+            if not self.client.is_allowed_redirect_uri(self.params['redirect_uri']):
                 logger.debug('[Token] Invalid redirect uri: %s', self.params['redirect_uri'])
                 raise TokenError('invalid_client')
 
