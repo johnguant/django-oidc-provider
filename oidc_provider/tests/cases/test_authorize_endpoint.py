@@ -76,6 +76,10 @@ class AuthorizationCodeFlowTestCase(TestCase, AuthorizeEndpointMixin):
         self.client_public = create_fake_client(response_type='code', is_public=True)
         self.client_public_with_no_consent = create_fake_client(
             response_type='code', is_public=True, require_consent=False)
+        self.client_public_pkce = create_fake_client(
+            response_type='code', is_public=True, require_pkce=True)
+        self.client_private_pkce = create_fake_client(
+            response_type='code', is_public=False, require_pkce=True)
         self.state = uuid.uuid4().hex
         self.nonce = uuid.uuid4().hex
 
@@ -496,6 +500,46 @@ class AuthorizationCodeFlowTestCase(TestCase, AuthorizeEndpointMixin):
         self.assertIn('prompt', strip_prompt_login(path3))
         self.assertIn('none', strip_prompt_login(path3))
         self.assertNotIn('login', strip_prompt_login(path3))
+
+    def test_public_client_require_pkce(self):
+        """
+        Test that a public client with require_pkce set rejects requests without the code
+        challenge.
+        """
+
+        data = {
+            'client_id': self.client_public_pkce.client_id,
+            'response_type': 'code',
+            'redirect_uri': self.client_public_pkce.default_redirect_uri,
+            'scope': 'openid email',
+            'state': self.state,
+            'prompt': 'consent'
+        }
+
+        response = self._auth_request('get', data, is_user_authenticated=True)
+
+        self.assertIn('invalid_request', response['Location'])
+
+    @patch('oidc_provider.views.render')
+    def test_confidential_client_require_pkce(self, render_patched):
+        """
+        Test that confidential clients with require_pkce set accept requests without the code
+        challenge.
+        """
+
+        data = {
+            'client_id': self.client_private_pkce.client_id,
+            'response_type': 'code',
+            'redirect_uri': self.client_private_pkce.default_redirect_uri,
+            'scope': 'openid email',
+            'state': self.state,
+            'prompt': 'consent'
+        }
+
+        self._auth_request('get', data, is_user_authenticated=True)
+        render_patched.assert_called_once()
+        self.assertTrue(
+            render_patched.call_args[0][1], settings.get('OIDC_TEMPLATES')['authorize'])
 
 
 class AuthorizationImplicitFlowTestCase(TestCase, AuthorizeEndpointMixin):
