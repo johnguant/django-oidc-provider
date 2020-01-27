@@ -96,7 +96,7 @@ class AuthorizeEndpoint(object):
         if self.is_authentication and not self.params['redirect_uri']:
             logger.debug('[Authorize] Missing redirect uri.')
             raise RedirectUriError()
-        if not (self.params['redirect_uri'] in self.client.redirect_uris):
+        if not self.client.is_allowed_redirect_uri(self.params['redirect_uri']):
             logger.debug('[Authorize] Invalid redirect uri: %s', self.params['redirect_uri'])
             raise RedirectUriError()
 
