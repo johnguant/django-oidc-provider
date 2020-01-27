@@ -198,7 +198,7 @@ class Client(models.Model):
                     else "//" + allowed_redirect_uri_str
                 )
             except ValueError:
-                return False
+                continue
 
             # Elements that should be checked, excludes port & netloc
             getter = attrgetter(
