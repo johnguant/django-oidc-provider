@@ -106,9 +106,9 @@ class Client(models.Model):
         help_text=_('If disabled, the Server will NEVER ask the user for consent.'))
     require_pkce = models.BooleanField(
         default=True,
-        verbose_name=_('Require PKCE'),
+        verbose_name=_('Require PKCE?'),
         help_text=_(
-            'Require PKCE (RFC7636) for public clients. You should only disable this if you know'
+            'Require PKCE (RFC7636) for public clients. You should only disable this if you know '
             'that the client does not support it. Has no effect on confidential clients.'
         )
     )
