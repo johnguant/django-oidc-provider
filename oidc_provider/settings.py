@@ -191,10 +191,18 @@ class DefaultSettings(object):
         RECOMMENDED: A string, one of ['database', 'filesystem']
 
         If this is set to 'database' RSA certs will be stored in the database.
-        If this is set to 'filesystem' they will be stored in `MEDIA_ROOT`.
+        If this is set to 'filesystem' they will be stored in `OIDC_RSA_CERT_LOCATION`.
         """
 
         return 'database'
+
+    @property
+    def OIDC_RSA_CERT_LOCATION(self):
+        """
+        REQUIRED IF `OIDC_RSA_CERT_STORE='filesystem': An absolute path to a writable directory.
+        """
+
+        return None
 
 
 default_settings = DefaultSettings()
