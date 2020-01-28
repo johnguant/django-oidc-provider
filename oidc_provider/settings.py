@@ -204,6 +204,15 @@ class DefaultSettings(object):
 
         return None
 
+    @property
+    def OIDC_REFRESH_TOKEN_ALIVE_HOOK(self):
+        """
+        OPTIONAL: A string with the location of your function.
+        This is called to determine whether a given token object is still valid.
+        """
+
+        return 'oidc_provider.lib.utils.common.default_refresh_token_alive_hook'
+
 
 default_settings = DefaultSettings()
 

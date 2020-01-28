@@ -272,4 +272,13 @@ It is recommended to set this to ``'filesystem'`` for new applications if possib
 OIDC_RSA_CERT_LOCATION
 ======================
 
-REQUIRED IF `OIDC_RSA_CERT_STORE='filesystem': An absolute path to a writable directory.
+REQUIRED IF ``OIDC_RSA_CERT_STORE='filesystem'``: An absolute path to a writable directory.
+
+OIDC_REFRESH_TOKEN_ALIVE_HOOK
+=============================
+
+.. currentmodule:: oidc_provider.settings
+.. autoattribute:: DefaultSettings.OIDC_REFRESH_TOKEN_ALIVE_HOOK
+
+.. currentmodule:: oidc_provider.lib.utils.common
+.. autofunction:: default_refresh_token_alive_hook
