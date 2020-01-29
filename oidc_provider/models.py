@@ -265,7 +265,7 @@ class Code(BaseCodeTokenModel):
 
 class Token(BaseCodeTokenModel):
 
-    issued_at = models.DateTimeField(auto_now_add=True)
+    issued_at = models.DateTimeField(auto_now_add=True, null=True)
 
     user = models.ForeignKey(
         django_settings.AUTH_USER_MODEL,
@@ -341,6 +341,7 @@ class UserConsent(BaseCodeTokenModel):
     user = models.ForeignKey(
         django_settings.AUTH_USER_MODEL, verbose_name=_(u'User'), on_delete=models.CASCADE)
     date_given = models.DateTimeField(verbose_name=_(u'Date Given'))
+    expires_at = models.DateTimeField(verbose_name=_(u'Expiration Date'))
 
     class Meta:
         unique_together = ('user', 'client')

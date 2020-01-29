@@ -164,6 +164,9 @@ def default_refresh_token_alive_hook(issued_at, user, id_token, access_has_expir
     :rtype: bool
 
     .. _The ID Token: https://openid.net/specs/openid-connect-core-1_0.html#IDToken
+
+    .. warning::
+        ``issued_at`` may be ``None`` if the token was created prior to version v0.8.0
     """
     return True
 

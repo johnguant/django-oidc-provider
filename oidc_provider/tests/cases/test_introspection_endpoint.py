@@ -97,7 +97,7 @@ class IntrospectionTestCase(TestCase):
         self._assert_inactive(response)
 
     def test_token_expired_returns_inactive(self):
-        self.token.expires_at = timezone.now() - timezone.timedelta(seconds=60)
+        self.token.access_expires_at = timezone.now() - timezone.timedelta(seconds=60)
         self.token.save()
         response = self._make_request()
         self._assert_inactive(response)

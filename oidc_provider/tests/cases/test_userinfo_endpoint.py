@@ -100,7 +100,7 @@ class UserInfoTestCase(TestCase):
         token = self._create_token()
 
         # Make token expired.
-        token.expires_at = timezone.now() - timedelta(hours=1)
+        token.access_expires_at = timezone.now() - timedelta(hours=1)
         token.save()
 
         response = self._post_request(token.access_token)
