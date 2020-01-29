@@ -221,6 +221,9 @@ def import_from_str(value):
     """
     Attempt to import a class from a string representation.
     """
+    if callable(value):
+        return value
+
     try:
         parts = value.split('.')
         module_path, class_name = '.'.join(parts[:-1]), parts[-1]
