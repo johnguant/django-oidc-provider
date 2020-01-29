@@ -268,3 +268,8 @@ It is recommended to set this to ``'filesystem'`` for new applications if possib
 .. note::
     When using ``'filesystem'`` with the default file storage, or another local file storage, you will
     need to sync RSA keys between your application servers.
+
+OIDC_RSA_CERT_LOCATION
+======================
+
+REQUIRED IF `OIDC_RSA_CERT_STORE='filesystem': An absolute path to a writable directory.
