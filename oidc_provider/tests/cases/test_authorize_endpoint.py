@@ -501,7 +501,7 @@ class AuthorizationCodeFlowTestCase(TestCase, AuthorizeEndpointMixin):
         self.assertIn('none', strip_prompt_login(path3))
         self.assertNotIn('login', strip_prompt_login(path3))
 
-    def test_public_client_require_pkce(self):
+    def test_public_client_require_pkce_missing(self):
         """
         Test that a public client with require_pkce set rejects requests without the code
         challenge.
@@ -519,6 +519,29 @@ class AuthorizationCodeFlowTestCase(TestCase, AuthorizeEndpointMixin):
         response = self._auth_request('get', data, is_user_authenticated=True)
 
         self.assertIn('invalid_request', response['Location'])
+
+    @patch('oidc_provider.views.render')
+    def test_public_client_require_pkce(self, render_patched):
+        """
+        Test that a public client with require_pkce set accepts requests with PKCE.
+        """
+
+        data = {
+            'client_id': self.client_public_pkce.client_id,
+            'response_type': 'code',
+            'redirect_uri': self.client_public_pkce.default_redirect_uri,
+            'scope': 'openid email',
+            'state': self.state,
+            'prompt': 'consent',
+            # PKCE parameters.
+            'code_challenge': FAKE_CODE_CHALLENGE,
+            'code_challenge_method': 'S256',
+        }
+
+        self._auth_request('get', data, is_user_authenticated=True)
+        render_patched.assert_called_once()
+        self.assertTrue(
+            render_patched.call_args[0][1], settings.get('OIDC_TEMPLATES')['authorize'])
 
     @patch('oidc_provider.views.render')
     def test_confidential_client_require_pkce(self, render_patched):
