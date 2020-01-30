@@ -127,6 +127,15 @@ class AuthorizeEndpoint(object):
                 raise AuthorizeError(
                     self.params['redirect_uri'], 'invalid_request', self.grant_type)
 
+        # Require PKCE for public clients that have 'require_pkce' set
+        if self.client.client_type == 'public' and self.client.require_pkce:
+            if not self.params['code_challenge']:
+                raise AuthorizeError(
+                    self.params['redirect_uri'],
+                    'invalid_request',
+                    self.grant_type, description='code challenge required'
+                )
+
     def create_response_uri(self):
         uri = urlsplit(self.params['redirect_uri'])
         query_params = parse_qs(uri.query)

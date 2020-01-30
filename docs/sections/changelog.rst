@@ -12,6 +12,7 @@ Unreleased
 * Added: Support for storing RSA keys in the filesystem instead of the database.
 * Added: CLI command to migrate RSA keys to the filesystem `migratersakeys`.
 * Added: Support for the `claims_supported` field of openid-configuration.
+* Added: Client option to require PKCE (RFC 7636). Defaults to on for **new** clients.
 * Changed: Loopback redirect URIs accept any port (RFC8252)
 * Fixed: example project on Django 2.1.
 * Fixed: example in docs for translatable scopes (ugettext).

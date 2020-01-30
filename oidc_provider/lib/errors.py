@@ -98,9 +98,9 @@ class AuthorizeError(Exception):
                                       'the registration parameter',
     }
 
-    def __init__(self, redirect_uri, error, grant_type):
+    def __init__(self, redirect_uri, error, grant_type, description=None):
         self.error = error
-        self.description = self._errors.get(error)
+        self.description = description or self._errors.get(error)
         self.redirect_uri = redirect_uri
         self.grant_type = grant_type
 

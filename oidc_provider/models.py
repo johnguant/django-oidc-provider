@@ -105,6 +105,14 @@ class Client(models.Model):
         default=True,
         verbose_name=_('Require Consent?'),
         help_text=_('If disabled, the Server will NEVER ask the user for consent.'))
+    require_pkce = models.BooleanField(
+        default=True,
+        verbose_name=_('Require PKCE?'),
+        help_text=_(
+            'Require PKCE (RFC7636) for public clients. You should only disable this if you know '
+            'that the client does not support it. Has no effect on confidential clients.'
+        )
+    )
     _redirect_uris = models.TextField(
         default='', verbose_name=_(u'Redirect URIs'),
         help_text=_(
