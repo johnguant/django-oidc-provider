@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('oidc_provider', '0028_redirect_uris_help_text'),
+        ('oidc_provider', '0029_rsa_key_storage'),
     ]
 
     operations = [

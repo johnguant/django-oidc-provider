@@ -14,6 +14,7 @@ from django.core.exceptions import ValidationError
 from Cryptodome.PublicKey import RSA
 
 from oidc_provider import settings
+from oidc_provider.lib.utils.storage import KeyStorage
 
 
 CLIENT_TYPE_CHOICES = [
@@ -354,9 +355,9 @@ class RSAKeyDatabase(RSAKey):
 class RSAKeyFilesystem(RSAKey):
 
     _key = models.FileField(
-        upload_to="oidc_provider/rsa_keys/",
         verbose_name=_('Key'),
-        help_text=_('Upload your private key here.')
+        help_text=_('Upload your private key here.'),
+        storage=KeyStorage()
     )
 
     @property
