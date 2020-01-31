@@ -277,8 +277,21 @@ REQUIRED IF ``OIDC_RSA_CERT_STORE='filesystem'``: An absolute path to a writable
 OIDC_REFRESH_TOKEN_ALIVE_HOOK
 =============================
 
-.. currentmodule:: oidc_provider.settings
-.. autoattribute:: DefaultSettings.OIDC_REFRESH_TOKEN_ALIVE_HOOK
+OPTIONAL: A string with the location of your function.
 
-.. currentmodule:: oidc_provider.lib.utils.common
-.. autofunction:: default_refresh_token_alive_hook
+This is called to determine whether a given token object is still valid.
+
+Receives the following arguments:
+
+* ``issued_at``: ``datetime.datetime`` The date and time the token was issued. 
+
+* ``user``: ``DJANGO_AUTH_USER_MODEL`` The user this token was issued for.
+
+* ``id_token``: The `ID Token <https://openid.net/specs/openid-connect-core-1_0.html#IDToken>`_.
+
+* ``access_has_expired``: ``bool`` Whether the associated access token has expired.
+
+Returns: ``bool`` Whether the refresh token should still be considered 'alive'.
+
+.. warning::
+    ``issued_at`` may be ``None`` if the token was created prior to version v0.8.0
