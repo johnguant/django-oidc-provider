@@ -3,6 +3,7 @@ import logging
 import re
 
 from django.http import HttpResponse
+from django.views.decorators.vary import vary_on_headers
 
 from oidc_provider.lib.errors import BearerTokenError
 from oidc_provider.models import Token
@@ -86,6 +87,7 @@ def protected_resource_view(scopes=None):
                     error.code, error.description)
                 return response
 
+            @vary_on_headers('Authorization')
             return view(request,  *args, **kwargs)
 
         return view_wrapper
