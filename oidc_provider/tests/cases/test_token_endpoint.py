@@ -467,7 +467,7 @@ class TokenTestCase(TestCase):
     @override_settings(OIDC_REFRESH_TOKEN_ALIVE_HOOK=Mock(return_value=True))
     def test_alive_refresh_token(self):
         """
-        Test that a dead refresh token, as defined by the hook, is rejected with 'invalid_grant'.
+        Test that an alive refresh token, as defined by the hook, is accepted.
         See https://tools.ietf.org/html/rfc6749#section-5.2
         """
 
