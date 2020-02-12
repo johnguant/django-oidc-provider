@@ -343,6 +343,9 @@ class UserConsent(BaseCodeTokenModel):
     date_given = models.DateTimeField(verbose_name=_(u'Date Given'))
     expires_at = models.DateTimeField(verbose_name=_(u'Expiration Date'))
 
+    def has_expired(self):
+        return timezone.now() >= self.expires_at
+
     class Meta:
         unique_together = ('user', 'client')
 

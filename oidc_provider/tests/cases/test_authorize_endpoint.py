@@ -261,6 +261,44 @@ class AuthorizationCodeFlowTestCase(TestCase, AuthorizeEndpointMixin):
                                    client=self.client_with_no_consent)
         self.assertEqual(is_code_ok, True, msg='Code returned is invalid or missing.')
 
+    def test_user_consent_already_given(self):
+        """
+        Tests that the authorisation prompt is skipped if the user has already given
+        authorisation to that client.
+        """
+        data = {
+            'client_id': self.client.client_id,
+            'redirect_uri': self.client.default_redirect_uri,
+            'response_type': 'code',
+            'scope': 'openid email',
+            'state': self.state,
+            'allow': 'Accept',
+        }
+
+        request = self.factory.post(reverse('oidc_provider:authorize'),
+                                    data=data)
+        # Simulate that the user is logged.
+        request.user = self.user
+
+        response = self._auth_request('post', data, is_user_authenticated=True)
+
+        self.assertIn('code', response['Location'], msg='Code is missing in the returned url.')
+
+        response = self._auth_request('post', data, is_user_authenticated=True)
+
+        is_code_ok = is_code_valid(url=response['Location'],
+                                   user=self.user,
+                                   client=self.client)
+        self.assertEqual(is_code_ok, True, msg='Code returned is invalid.')
+
+        del data['allow']
+        response = self._auth_request('get', data, is_user_authenticated=True)
+
+        is_code_ok = is_code_valid(url=response['Location'],
+                                   user=self.user,
+                                   client=self.client)
+        self.assertEqual(is_code_ok, True, msg='Code returned is invalid or missing.')
+
     def test_response_uri_is_properly_constructed(self):
         """
         Check that the redirect_uri matches the one configured for the client.
